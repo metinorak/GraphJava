@@ -86,6 +86,30 @@ public class Graph {
         }
         return bfs;
     }
+   
+    public ArrayList<Vertex> DFS(Vertex s){
+        if (!V.contains(s))
+                return null;
+        HashMap<Vertex, Boolean> visited = new HashMap<>();
+        ArrayList<Vertex> dfs = new ArrayList<>();
+        
+        
+        DFSTraversal(s, dfs, visited);
+        
+        return dfs;
+    }
+    
+    private void DFSTraversal
+        (Vertex s, ArrayList<Vertex> dfs, HashMap<Vertex, Boolean> visited){
+        visited.put(s, true);
+        dfs.add(s);
+        
+        for(Vertex w: this.getAdjacentVertices(s)){
+            if(!visited.containsKey(w)){
+                DFSTraversal(w, dfs, visited);
+            }
+        }
+    }
     
     public Stack<Vertex> getShortestPath(Vertex initial, Vertex terminal){
         class VertexWithPriority implements Comparable<VertexWithPriority>{

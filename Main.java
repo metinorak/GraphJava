@@ -33,6 +33,7 @@ public class Main {
         //System.out.println(G);
         //System.out.println(G.BFS(A));
         System.out.println(G.getShortestPath(A, E));
+        System.out.println(G.DFS(A));
     }
 
 }
