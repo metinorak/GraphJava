@@ -88,11 +88,12 @@ public class Graph {
     }
    
     public ArrayList<Vertex> DFS(Vertex s){
-        if (!V.contains(s))
-                return null;
+        if (!V.contains(s)){
+            return null;
+        }
+        
         HashMap<Vertex, Boolean> visited = new HashMap<>();
         ArrayList<Vertex> dfs = new ArrayList<>();
-        
         
         DFSTraversal(s, dfs, visited);
         
