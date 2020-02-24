@@ -1,100 +1,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
-
-class Vertex {
-    private String label;
-    public Vertex(String label) {
-            this.label = label;
-    }
-    public Vertex() {
-        this("");
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        //sb.append("V: ");
-        sb.append(label);
-        return sb.toString();
-    }
-}
-
-class Edge {
-    private String label;
-    private int cost;
-    private Vertex v1, v2;
-
-    public Edge(Vertex v1, Vertex v2, int cost, String label) {
-        this.v1 = v1;
-        this.v2 = v2;
-        this.cost = cost;
-        this.label = label;
-    }
-
-    public Edge(Vertex v1, Vertex v2, String label) {
-        this(v1, v2, 1, label);
-    }
-
-    public Edge(Vertex v1, Vertex v2, int cost) {
-        this(v1, v2, cost, "");
-    }
-
-    public Edge(Vertex v1, Vertex v2) {
-        this(v1, v2, 1, "");
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public int getCost() {
-        return cost;
-    }
-
-    public void setCost(int cost) {
-        this.cost = cost;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public void setV1(Vertex v1) {
-        this.v1 = v1;
-    }
-
-    public void setV2(Vertex v2) {
-        this.v2 = v2;
-    }
-
-    public Vertex getV1() {
-        return v1;
-    }
-
-    public Vertex getV2() {
-        return v2;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        //sb.append("E: ");
-        sb.append(v1);
-        sb.append(" -- ");
-        sb.append(v2);
-        return sb.toString();
-    }
-}
+import java.util.Stack;
 
 public class Graph {
     private ArrayList<Vertex> V = new ArrayList<Vertex>();
@@ -177,4 +86,93 @@ public class Graph {
         }
         return bfs;
     }
+    
+    public Stack<Vertex> getShortestPath(Vertex initial, Vertex terminal){
+        class VertexWithPriority implements Comparable<VertexWithPriority>{
+            private Vertex v;
+            private int cost;
+            VertexWithPriority(Vertex v, int cost){
+                this.v = v;
+                this.cost = cost;
+            }
+
+            public Vertex getV() {
+                return v;
+            }
+
+            public void setV(Vertex v) {
+                this.v = v;
+            }
+
+            public int getCost() {
+                return cost;
+            }
+
+            public void setCost(int cost) {
+                this.cost = cost;
+            }
+
+            @Override
+            public int compareTo(VertexWithPriority o) {
+                if(this.cost < o.getCost()){
+                    return -1;
+                }
+                else if(o.getCost() < this.cost){
+                    return 1;
+                }
+                return 0;
+            }
+
+            public boolean equals(VertexWithPriority obj) {
+                if(this.v == obj.getV()){
+                    return true;
+                }
+                return false;
+            }
+            
+        }
+        
+        HashMap<Vertex, Vertex> path = new HashMap<>();
+        PriorityQueue<VertexWithPriority> queue = new PriorityQueue<>();
+        HashMap<Vertex, Integer> distance = new HashMap<>();
+        
+        distance.put(initial, 0);
+        queue.add(new VertexWithPriority(initial, 0));
+        
+        while(!queue.isEmpty()){
+            Vertex v = queue.poll().getV();
+            this.getAdjacentEdges(v).forEach((e) -> {
+                Vertex w = e.getV2();
+                int newDistance = distance.get(v) + e.getCost();
+                VertexWithPriority newVP = new VertexWithPriority(w, newDistance);
+                if(!distance.containsKey(w)){
+                    distance.put(w, newDistance);
+                    queue.add(newVP);
+                    path.put(w, v);
+                }
+                if (newDistance < distance.get(w)) {
+                    distance.put(w, newDistance);
+                    path.put(w, v);
+                    queue.remove(newVP);
+                    queue.add(newVP);
+                }
+            });
+            
+        }
+        
+        Stack<Vertex> lastPath = new Stack<>();
+        Vertex parentVertex = terminal;
+        
+        while(parentVertex != null){
+            lastPath.add(parentVertex);
+            parentVertex = path.get(parentVertex);
+            
+        }
+        
+        if(lastPath.firstElement() == terminal && lastPath.lastElement() == initial){
+            return lastPath;
+        }
+        return null;
+    }
+    
 }
